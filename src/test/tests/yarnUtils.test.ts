@@ -188,7 +188,7 @@ describe('Yarn Utils Tests', async () => {
         let res: DependenciesTreeNode[] = await runCreateYarnDependencyTrees(componentsToScan, parent);
 
         // Check that components to scan contains progress:2.0.3
-        assert.isTrue(componentsToScan.length === 3);
+        assert.lengthOf(componentsToScan, 3);
         let found: boolean = false;
         for (let index: number = 0; index < componentsToScan.length; index++) {
             componentsToScan[index].dependencies.forEach(componentDetails => {
@@ -243,7 +243,7 @@ describe('Yarn Utils Tests', async () => {
         let yarnLocks: vscode.Uri[] | undefined = packageDescriptors.get(PackageType.Yarn);
         assert.isDefined(yarnLocks);
         await YarnUtils.createDependenciesTrees(yarnLocks, componentsToScan, treesManager, parent, () => {
-            assert;
+            //
         });
         return parent.children.sort((lhs, rhs) => (<string>lhs.label).localeCompare(<string>rhs.label));
     }
