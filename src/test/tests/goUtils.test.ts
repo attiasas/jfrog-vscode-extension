@@ -98,13 +98,9 @@ describe('Go Utils Tests', async () => {
         let textDocument: vscode.TextDocument = await vscode.workspace.openTextDocument(goMod);
 
         let dependenciesTreeNode: DependenciesTreeNode = new DependenciesTreeNode(
-            new GeneralInfo('github.com/jfrog/jfrog-cli-core', '1.9.1', [], '', '')
+            new GeneralInfo('github.com/jfrog/jfrog-cli-core', '1.9.0', [], '', '')
         );
-        let dependencyPos: vscode.Position[] = GoUtils.getDependencyPosition(
-            textDocument,
-            dependenciesTreeNode.dependencyId ?? '',
-            FocusType.Dependency
-        );
+        let dependencyPos: vscode.Position[] = GoUtils.getDependencyPosition(textDocument, dependenciesTreeNode.dependencyId, FocusType.Dependency);
         assert.deepEqual(dependencyPos[0], new vscode.Position(5, 1));
         assert.deepEqual(dependencyPos[1], new vscode.Position(5, 39));
 

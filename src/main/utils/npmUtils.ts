@@ -114,6 +114,8 @@ export class NpmUtils {
     }
 
     public static runNpmLs(scope: NpmGlobalScopes, workspaceFolder: string): any {
+        // Running with --dev returns both prod and dev! (when running command it suggest to replace the flags to -omit=dev / -include=dev also returns both)
+        // there is no such method that could fetch only the dev
         return JSON.parse(ScanUtils.executeCmd('npm ls --json --all --package-lock-only --' + scope, workspaceFolder).toString());
     }
 }

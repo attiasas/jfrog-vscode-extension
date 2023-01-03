@@ -97,7 +97,6 @@ export abstract class FileTreeNode extends vscode.TreeItem {
         })(fullPath);
 
         node.name += ' - ' + (reason ?? '[Fail to scan]');
-        node.tooltip = fullPath;
         node._severity = Severity.Unknown;
         return node;
     }

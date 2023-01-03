@@ -70,7 +70,12 @@ export class DescriptorUtils {
         return impactPaths;
     }
 
-    private static populateDependencyIssue(issue: IVulnerability, dependencyWithIssue: DependencyIssuesTreeNode, severity: Severity, impactedPath?: IImpactedPath) {
+    private static populateDependencyIssue(
+        issue: IVulnerability,
+        dependencyWithIssue: DependencyIssuesTreeNode,
+        severity: Severity,
+        impactedPath?: IImpactedPath
+    ) {
         let violationIssue: IViolation = <IViolation>issue;
         if (violationIssue && violationIssue.license_key && impactedPath) {
             // License violation
@@ -107,11 +112,7 @@ export class DescriptorUtils {
             let severity: Severity = SeverityUtils.getSeverity(issue.severity);
             // Populate the issue for each dependency component
             for (let [componentId, component] of Object.entries(issue.components)) {
-                let dependencyWithIssue: DependencyIssuesTreeNode = descriptorNode.addNode(
-                    componentId,
-                    component,
-                    severity
-                );
+                let dependencyWithIssue: DependencyIssuesTreeNode = descriptorNode.addNode(componentId, component, severity);
 
                 let matchIssue: IssueTreeNode | undefined = dependencyWithIssue.issues.find(issueExists => issueExists.issueId === issue.issue_id);
                 let violationIssue: IViolation = <IViolation>issue;
@@ -119,8 +120,8 @@ export class DescriptorUtils {
                     // In case multiple watches are assigned and there are componenets that overlap between the watches
                     // Xray will return component duplication (just watch_name different), combine those results
                     matchIssue.watchNames.push(violationIssue.watch_name);
-                } else if (!matchIssue) { 
-                    this.populateDependencyIssue(issue,dependencyWithIssue,severity,impactedPath);
+                } else if (!matchIssue) {
+                    this.populateDependencyIssue(issue, dependencyWithIssue, severity, impactedPath);
                 }
 
                 // let violationIssue: IViolation = <IViolation>issue;
