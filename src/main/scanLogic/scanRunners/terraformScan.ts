@@ -1,9 +1,7 @@
-import * as path from 'path';
 import * as os from 'os';
 
 import { ConnectionManager } from '../../connect/connectionManager';
 import { LogManager } from '../../log/logManager';
-import { ScanUtils } from '../../utils/scanUtils';
 import { AnalyzeIssue, AnalyzerScanResponse, AnalyzeScanRequest, FileRegion } from './analyzerModels';
 import { BinaryRunner } from './binaryRunner';
 import { Severity } from '../../types/severity';
@@ -27,7 +25,7 @@ export interface TerraformIssue {
 }
 
 export class TerraformRunner extends BinaryRunner {
-    private static readonly BINARY_FOLDER: string = 'terraform';
+    // private static readonly BINARY_FOLDER: string = 'terraform';
     private static readonly BINARY_NAME: string = 'tf_scanner';
 
     constructor(connectionManager: ConnectionManager, abortCheckInterval: number, logManager: LogManager) {
@@ -35,7 +33,7 @@ export class TerraformRunner extends BinaryRunner {
             connectionManager,
             abortCheckInterval,
             logManager,
-            path.join(ScanUtils.getHomePath(), TerraformRunner.BINARY_FOLDER, TerraformRunner.getBinaryName())
+            // path.join(ScanUtils.getHomePath(), TerraformRunner.BINARY_FOLDER, TerraformRunner.getBinaryName())
         );
     }
 
@@ -63,7 +61,7 @@ export class TerraformRunner extends BinaryRunner {
 
     /** @override */
     public async runBinary(abortSignal: AbortSignal, yamlConfigPath: string): Promise<void> {
-        await this.executeBinary(abortSignal, ['scan', yamlConfigPath]);
+        await this.executeBinary(abortSignal, ['iac', yamlConfigPath]);
     }
 
     /**

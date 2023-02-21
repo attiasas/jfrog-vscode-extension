@@ -1,9 +1,7 @@
-import * as path from 'path';
 import * as os from 'os';
 
 import { LogManager } from '../../log/logManager';
 import { BinaryRunner } from './binaryRunner';
-import { ScanUtils } from '../../utils/scanUtils';
 import { AnalyzeIssue, AnalyzerScanResponse, AnalyzeScanRequest, AnalyzeLocation, FileRegion, FileLocation, CodeFlow } from './analyzerModels';
 import { ConnectionManager } from '../../connect/connectionManager';
 import { AnalyzerUtils } from '../../treeDataProviders/utils/analyzerUtils';
@@ -39,7 +37,7 @@ export interface EosIssueLocation {
 }
 
 export class EosRunner extends BinaryRunner {
-    private static readonly BINARY_FOLDER: string = 'eos';
+    // private static readonly BINARY_FOLDER: string = 'eos';
     private static readonly BINARY_NAME: string = 'eos_scanner';
 
     constructor(connectionManager: ConnectionManager, abortCheckInterval: number, logManager: LogManager) {
@@ -47,7 +45,7 @@ export class EosRunner extends BinaryRunner {
             connectionManager,
             abortCheckInterval,
             logManager,
-            path.join(ScanUtils.getHomePath(), EosRunner.BINARY_FOLDER, EosRunner.getBinaryName())
+            // path.join(ScanUtils.getHomePath(), EosRunner.BINARY_FOLDER, EosRunner.getBinaryName())
         );
     }
 
@@ -75,7 +73,7 @@ export class EosRunner extends BinaryRunner {
 
     /** @override */
     public async runBinary(abortSignal: AbortSignal, yamlConfigPath: string): Promise<void> {
-        await this.executeBinary(abortSignal, ['analyze', 'config', yamlConfigPath]);
+        await this.executeBinary(abortSignal, ['zd', yamlConfigPath]);
     }
 
     /**
