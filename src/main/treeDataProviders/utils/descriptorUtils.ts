@@ -204,7 +204,7 @@ export class DescriptorUtils {
     }
 
     private static searchDependencyGraph(descriptorDir: string, node: RootNode): RootNode | undefined {
-        if (node.fullPath == descriptorDir || node.projectDetails.path == descriptorDir) {
+        if (node.fullPath == descriptorDir || node.projectDetails.path == descriptorDir || node.fullPath == path.dirname(descriptorDir) || node.projectDetails.path == path.dirname(descriptorDir)) {
             return node;
         }
         for (const child of node.children) {

@@ -19,6 +19,7 @@ import { ILicenseCacheObject } from '../types/licenseCacheObject';
 import { Severity } from '../types/severity';
 import { FileLocation, SeverityLevel } from '../scanLogic/scanRunners/analyzerModels';
 import { toPackageType } from '../types/projectType';
+import { Utils } from '../treeDataProviders/utils/utils';
 
 export class Translators {
     public static toGeneralInfo(clientGeneral: IGeneral): GeneralInfo {
@@ -160,7 +161,7 @@ export class Translators {
             for (let location of locations) {
                 const artifactLocation  : string = location.artifactLocation.uri;
                 codeFlow.push({
-                    fileName: artifactLocation.split('/')[artifactLocation.length - 1],
+                    fileName: Utils.getLastSegment(artifactLocation),
                     file: artifactLocation,
                     snippet: location.region.snippet?.text,
                     row: location.region.startLine,

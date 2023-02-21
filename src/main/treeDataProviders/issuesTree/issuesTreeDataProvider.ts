@@ -28,6 +28,7 @@ import { ApplicableTreeNode } from './codeFileTree/applicableTreeNode';
 import { DescriptorIssuesData, FileIssuesData, WorkspaceIssuesData } from '../../types/issuesData';
 import { EosTreeNode } from './codeFileTree/eosTreeNode';
 import { NotEntitledError } from '../../scanLogic/scanRunners/binaryRunner';
+import { TerraformTreeNode } from './codeFileTree/terraformTreeNode';
 
 export interface ScanConfig {
     dependencyScan: boolean;
@@ -556,7 +557,7 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
     ): Promise<void> {
         let cveToScan: string[] = [];
         descriptorNode.issues.forEach(issue => {
-            if (issue instanceof CveTreeNode && issue.cve && issue.cve.cve && !cveToScan.find(i => issue.cve && i == issue.cve.cve)) {
+            if (issue instanceof CveTreeNode && !issue.parent.indirect && issue.cve && issue.cve.cve && !cveToScan.find(i => issue.cve && i == issue.cve.cve)) {
                 cveToScan.push(issue.cve.cve);
             }
         });
@@ -690,7 +691,7 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                 element.command = Utils.createNodeCommand('jfrog.view.details.page', 'Show details', [element.getDetailsPage()]);
             }
             // Source code issues nodes
-            if (element instanceof ApplicableTreeNode || element instanceof EosTreeNode) {
+            if (element instanceof ApplicableTreeNode || element instanceof EosTreeNode || element instanceof TerraformTreeNode) {
                 element.command = Utils.createNodeCommand('jfrog.issues.file.open.details', 'Open file location and show details', [
                     element.parent.fullPath,
                     element.regionWithIssue,
