@@ -298,7 +298,7 @@ export class AnalyzerUtils {
     }
 
     public static async runIac(
-        workspaceData: WorkspaceIssuesData,
+        workspaceData: ScanResults,
         root: IssuesRootTreeNode,
         scanManager: ScanManager,
         progressManager: StepProgress
@@ -337,7 +337,7 @@ export class AnalyzerUtils {
      * @param workspaceData - data to populate on node
      * @returns number of Iac issues populated
      */
-    public static populateIacIssues(root: IssuesRootTreeNode, workspaceData: WorkspaceIssuesData): number {
+    public static populateIacIssues(root: IssuesRootTreeNode, workspaceData: ScanResults): number {
         root.iacScanTimeStamp = workspaceData.iacScanTimestamp;
         let issuesCount: number = 0;
         if (workspaceData.iacScan && workspaceData.iacScan.filesWithIssues) {

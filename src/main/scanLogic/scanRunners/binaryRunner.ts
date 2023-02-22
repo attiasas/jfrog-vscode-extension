@@ -69,7 +69,7 @@ export abstract class BinaryRunner {
      * @returns the name of the expected binary file to run
      */
     protected static getBinaryName(): string {
-        let name: string = 'analyzerManager';
+        let name: string = BinaryRunner.RUNNER_NAME;
         switch (os.platform()) {
             case 'win32':
                 return name + '_windows.exe';

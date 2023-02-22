@@ -2,6 +2,7 @@ import { IGraphResponse } from 'jfrog-client-js';
 import { IImpactGraph } from 'jfrog-ide-webview';
 import { ApplicabilityScanResponse } from '../scanLogic/scanRunners/applicabilityScan';
 import { EosScanResponse } from '../scanLogic/scanRunners/eosScan';
+import { TerraformScanResponse } from '../scanLogic/scanRunners/terraformScan';
 import { PackageType } from './projectType';
 
 /**
@@ -12,6 +13,8 @@ export class ScanResults {
     private _workspaceIssues: DependencyScanResults | undefined;
     private _eosScan: EosScanResponse = {} as EosScanResponse;
     private _eosScanTimestamp?: number;
+    private _iacScan: TerraformScanResponse = {} as TerraformScanResponse;
+    private _iacScanTimestamp?: number;
     private _failedFiles: FileIssuesData[] = [];
 
     constructor(private _path: string) {}
@@ -24,6 +27,9 @@ export class ScanResults {
         }
         workspaceIssuesDetails.issues = tmp._workspaceIssues;
         workspaceIssuesDetails.eosScan = tmp._eosScan;
+        workspaceIssuesDetails.eosScanTimestamp = tmp._eosScanTimestamp;
+        workspaceIssuesDetails.iacScan = tmp._iacScan;
+        workspaceIssuesDetails.iacScanTimestamp = tmp.iacScanTimestamp;
         if (tmp._failedFiles) {
             workspaceIssuesDetails.failedFiles.push(...tmp._failedFiles);
         }
@@ -35,7 +41,7 @@ export class ScanResults {
      * @returns true if at least one issue exists
      */
     public hasIssues(): boolean {
-        return this.descriptorsIssues.length > 0 || this.eosScan?.filesWithIssues?.length > 0 || !!this._workspaceIssues;
+        return this.descriptorsIssues.length > 0 || this.eosScan?.filesWithIssues?.length > 0 || this.iacScan?.filesWithIssues?.length > 0 || !!this._workspaceIssues;
     }
 
     get path(): string {
@@ -72,6 +78,22 @@ export class ScanResults {
 
     set eosScanTimestamp(value: number | undefined) {
         this._eosScanTimestamp = value;
+    }
+
+    get iacScan(): TerraformScanResponse {
+        return this._iacScan;
+    }
+
+    set iacScan(value: TerraformScanResponse) {
+        this._iacScan = value;
+    }
+
+    get iacScanTimestamp(): number | undefined {
+        return this._iacScanTimestamp;
+    }
+
+    set iacScanTimestamp(value: number | undefined) {
+        this._iacScanTimestamp = value;
     }
 
     get failedFiles(): FileIssuesData[] {

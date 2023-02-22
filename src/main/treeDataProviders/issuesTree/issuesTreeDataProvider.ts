@@ -201,9 +201,9 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                 root.eosScanTimeStamp = scanResults.eosScanTimestamp;
                 AnalyzerUtils.populateEosIssues(root, scanResults);
             }
-            if (workspaceData.iacScan) {
-                root.eosScanTimeStamp = workspaceData.eosScanTimestamp;
-                AnalyzerUtils.populateIacIssues(root, workspaceData);
+            if (scanResults.iacScan) {
+                root.eosScanTimeStamp = scanResults.eosScanTimestamp;
+                AnalyzerUtils.populateIacIssues(root, scanResults);
             }
             return root;
         }
@@ -313,21 +313,21 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
             scansPromises.push(
                 DependenciesTreesFactory.createDependenciesTrees(
                     workspaceDescriptors,
-                    [root.workSpace],
+                    root.workSpace,
                     [],
                     this._treesManager,
                     progressManager,
                     checkCanceled
                 ).then(workspaceDependenciesTree =>
-                    this.descriptorsScanning(workspaceData, root, workspaceDescriptors, workspaceDependenciesTree, progressManager, checkCanceled)
+                    this.scanDependencies(scanResults, root, workspaceDescriptors, workspaceDependenciesTree, progressManager, checkCanceled)
                 )
             );
         }
         if (eosSupported) {
-            scansPromises.push(AnalyzerUtils.runEos(workspaceData, root, workspaceDescriptors, this._scanManager, progressManager));
+            scansPromises.push(AnalyzerUtils.runEos(scanResults, root, workspaceDescriptors, this._scanManager, progressManager));
         }
         if (iacSupported) {
-            scansPromises.push(AnalyzerUtils.runIac(workspaceData, root, this._scanManager, progressManager));
+            scansPromises.push(AnalyzerUtils.runIac(scanResults, root, this._scanManager, progressManager));
         }
 
         await Promise.all(scansPromises);
