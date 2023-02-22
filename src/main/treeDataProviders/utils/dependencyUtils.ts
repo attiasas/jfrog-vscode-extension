@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { IComponent, IGraphResponse, IViolation, IVulnerability } from 'jfrog-client-js';
 import { RootNode } from '../dependenciesTree/dependenciesRoot/rootTree';
 import { DependenciesTreeNode } from '../dependenciesTree/dependenciesTreeNode';
@@ -19,6 +18,7 @@ import { FocusType } from '../../constants/contextKeys';
 import { DependencyScanResults } from '../../types/workspaceIssuesDetails';
 import { EnvironmentTreeNode } from '../issuesTree/descriptorTree/environmentTreeNode';
 import { ProjectDependencyTreeNode } from '../issuesTree/descriptorTree/projectDependencyTreeNode';
+import { NugetUtils } from '../../utils/nugetUtils';
 
 export class DependencyUtils {
     /**
@@ -182,12 +182,17 @@ export class DependencyUtils {
      * Get the dependency graph of a descriptor base on a given path
      * @param workspaceDependenciesTree - the dependencies graph for all the descriptors in the workspace
      * @param descriptorPath - the descriptor we want to fetch its sub tree graph
+     * @param descriptorType - the package type of the descriptor
      * @returns the descriptor dependencies tree if exists the provided workspace tree, undefined otherwise
      */
-    public static getDependencyGraph(workspaceDependenciesTree: DependenciesTreeNode, descriptorPath: string): RootNode | undefined {
+    public static getDependencyGraph(
+        workspaceDependenciesTree: DependenciesTreeNode,
+        descriptorPath: string,
+        descriptorType: PackageType
+    ): RootNode | undefined {
         // Search for the dependency graph of the descriptor
         for (const child of workspaceDependenciesTree.children) {
-            if (child instanceof RootNode) {
+            if (child instanceof RootNode && child.projectDetails.type === descriptorType) {
                 let graph: RootNode | undefined = this.searchDependencyGraph(descriptorPath, child);
                 if (graph) {
                     return graph;
@@ -197,13 +202,13 @@ export class DependencyUtils {
         return undefined;
     }
 
-    private static searchDependencyGraph(descriptorDir: string, node: RootNode): RootNode | undefined {
-        if (node.fullPath == descriptorDir || node.projectDetails.path == descriptorDir || node.fullPath == path.dirname(descriptorDir) || node.projectDetails.path == path.dirname(descriptorDir)) {
+    private static searchDependencyGraph(descriptorPath: string, node: RootNode): RootNode | undefined {
+        if (node.fullPath == descriptorPath || node.projectDetails.path == descriptorPath) {
             return node;
         }
         for (const child of node.children) {
             if (child instanceof RootNode) {
-                let graph: RootNode | undefined = this.searchDependencyGraph(descriptorDir, child);
+                let graph: RootNode | undefined = this.searchDependencyGraph(descriptorPath, child);
                 if (graph) {
                     return graph;
                 }
@@ -222,7 +227,7 @@ export class DependencyUtils {
         if (dependency.parent instanceof EnvironmentTreeNode) {
             return [];
         }
-        let document: vscode.TextDocument = await vscode.workspace.openTextDocument(dependency.parent.fullPath);
+        let document: vscode.TextDocument = await vscode.workspace.openTextDocument(dependency.parent.projectFilePath);
         if (dependency.indirect) {
             // Collect direct dependencies from all the issues impact tree first children
             let ranges: vscode.Range[] = [];
@@ -252,7 +257,10 @@ export class DependencyUtils {
      * @returns the list of positions in the document this dependency appears in
      */
     public static getDependencyPosition(document: vscode.TextDocument, packageType: PackageType, dependencyId: string): vscode.Range[] {
-        let dependencyName: string = packageType == PackageType.Maven ? dependencyId : dependencyId.substring(0, dependencyId.lastIndexOf(':'));
+        let dependencyName: string =
+            packageType == PackageType.Maven || packageType == PackageType.Nuget
+                ? dependencyId
+                : dependencyId.substring(0, dependencyId.lastIndexOf(':'));
 
         switch (packageType) {
             case PackageType.Go:
@@ -265,6 +273,8 @@ export class DependencyUtils {
                 return PypiUtils.getDependencyPosition(document, dependencyName);
             case PackageType.Yarn:
                 return YarnUtils.getDependencyPosition(document, dependencyName);
+            case PackageType.Nuget:
+                return NugetUtils.getDependencyPosition(document, dependencyName);
             default:
                 return [];
         }

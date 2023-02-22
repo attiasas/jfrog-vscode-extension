@@ -31,6 +31,10 @@ import { EnvironmentTreeNode } from './descriptorTree/environmentTreeNode';
 import { ProjectDependencyTreeNode } from './descriptorTree/projectDependencyTreeNode';
 import { ScanResults, DependencyScanResults, FileIssuesData } from '../../types/workspaceIssuesDetails';
 import { PypiUtils } from '../../utils/pypiUtils';
+import { EnvironmentTreeNode } from './descriptorTree/environmentTreeNode';
+import { ProjectDependencyTreeNode } from './descriptorTree/projectDependencyTreeNode';
+import { ScanResults, DependencyScanResults, FileIssuesData } from '../../types/workspaceIssuesDetails';
+import { PypiUtils } from '../../utils/pypiUtils';
 import { TerraformTreeNode } from './codeFileTree/terraformTreeNode';
 
 export interface ScanConfig {
@@ -202,7 +206,7 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                 AnalyzerUtils.populateEosIssues(root, scanResults);
             }
             if (scanResults.iacScan) {
-                root.eosScanTimeStamp = scanResults.eosScanTimestamp;
+                root.iacScanTimeStamp = scanResults.iacScanTimestamp;
                 AnalyzerUtils.populateIacIssues(root, scanResults);
             }
             return root;
@@ -308,6 +312,8 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
             (graphSupported ? (applicableSupported ? 2 : 1) * descriptorsCount : 0) + (eosSupported ? 1 : 0) + (iacSupported ? 1 : 0);
         progressManager.startStep('🔎 Scanning for issues', totalSubSteps);
         let scansPromises: Promise<any>[] = [];
+        scansPromises.push(AnalyzerUtils.runEos(scanResults, root, workspaceDescriptors, this._scanManager, progressManager));
+        // Dependency graph scan and applicability scan for each descriptor
         if (graphSupported) {
             // Dependency graph scan and applicability scan for each descriptor
             scansPromises.push(
@@ -364,7 +370,11 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
 
                 let descriptorNode: DescriptorTreeNode = new DescriptorTreeNode(descriptorData.fullPath, descriptorData.type);
                 // Search for the dependency graph of the descriptor
-                let descriptorGraph: RootNode | undefined = DependencyUtils.getDependencyGraph(workspaceDependenciesTree, descriptorPath.fsPath);
+                let descriptorGraph: RootNode | undefined = DependencyUtils.getDependencyGraph(
+                    workspaceDependenciesTree,
+                    descriptorPath.fsPath,
+                    descriptorData.type
+                );
                 if (!descriptorGraph) {
                     progressManager.reportProgress(2 * progressManager.getStepIncValue);
                     this._logManager.logMessage("Can't find descriptor graph for " + descriptorPath.fsPath, 'DEBUG');
@@ -699,13 +709,13 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
             }
             // File nodes
             if (element instanceof FileTreeNode) {
-                element.command = Utils.createNodeCommand('jfrog.issues.file.open', 'Open file', [element.fullPath]);
+                element.command = Utils.createNodeCommand('jfrog.issues.file.open', 'Open file', [element.projectFilePath]);
             }
             if (element instanceof DependencyIssuesTreeNode) {
                 let directDependenciesLocations: vscode.Range[] = await DependencyUtils.getDirectDependenciesLocations(element);
                 if (directDependenciesLocations?.length > 0) {
                     element.command = Utils.createNodeCommand('jfrog.issues.file.open.location', 'Open location in file', [
-                        element.parent.fullPath,
+                        element.parent.projectFilePath,
                         // If there are more than one direct dependency with this indirect jump to the first one
                         directDependenciesLocations[0]
                     ]);
@@ -718,7 +728,7 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
             // Source code issues nodes
             if (element instanceof ApplicableTreeNode || element instanceof EosTreeNode || element instanceof TerraformTreeNode) {
                 element.command = Utils.createNodeCommand('jfrog.issues.file.open.details', 'Open file location and show details', [
-                    element.parent.fullPath,
+                    element.parent.projectFilePath,
                     element.regionWithIssue,
                     element.getDetailsPage()
                 ]);

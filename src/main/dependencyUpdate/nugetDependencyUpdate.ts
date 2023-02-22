@@ -1,11 +1,12 @@
 import { DependencyIssuesTreeNode } from '../treeDataProviders/issuesTree/descriptorTree/dependencyIssuesTreeNode';
 import { PackageType } from '../types/projectType';
+import { NugetUtils } from '../utils/nugetUtils';
 import { ScanUtils } from '../utils/scanUtils';
 import { AbstractDependencyUpdate } from './abstractDependencyUpdate';
 
-export class NpmDependencyUpdate extends AbstractDependencyUpdate {
+export class NugetDependencyUpdate extends AbstractDependencyUpdate {
     constructor() {
-        super(PackageType.Npm);
+        super(PackageType.Nuget);
     }
 
     /** @override */
@@ -16,6 +17,11 @@ export class NpmDependencyUpdate extends AbstractDependencyUpdate {
     /** @override */
     public update(dependency: DependencyIssuesTreeNode, version: string): void {
         const workspace: string = dependency.getDependencyProjectPath();
-        ScanUtils.executeCmd('npm install ' + dependency.name + '@' + version, workspace);
+        let descriptorFile: string = dependency.getDependencyFilePath();
+        if (descriptorFile.endsWith(NugetUtils.PROJECT_SUFFIX)) {
+            ScanUtils.executeCmd('dotnet add package ' + dependency.name + ' --version ' + version, workspace);
+        } else {
+            ScanUtils.executeCmd('nuget update ' + descriptorFile + ' -Id ' + dependency.name + ' -Version ' + version, workspace);
+        }
     }
 }
