@@ -5,7 +5,7 @@ import { CodeIssueTreeNode } from './codeIssueTreeNode';
 export class CodeFileTreeNode extends FileTreeNode {
     private _codeIssues: CodeIssueTreeNode[] = [];
 
-    constructor(fileFullPath: string, parent?: IssuesRootTreeNode) {
+    constructor(public readonly fileFullPath: string, parent?: IssuesRootTreeNode) {
         super(fileFullPath, parent);
     }
 

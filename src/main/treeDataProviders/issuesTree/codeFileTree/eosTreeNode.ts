@@ -50,7 +50,7 @@ export class EosTreeNode extends CodeIssueTreeNode {
             pageType: PageType.Eos,
             location: {
                 fileName: this.parent.name,
-                file: this.parent.fullPath,
+                file: this.parent.fileFullPath,
                 snippet: this._snippet,
                 row: this.regionWithIssue.start.line + 1,
                 column: this.regionWithIssue.start.character

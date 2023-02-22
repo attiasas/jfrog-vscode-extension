@@ -47,7 +47,7 @@ export class TerraformTreeNode extends CodeIssueTreeNode {
             header: this.label,
             severity: SeverityUtils.toWebviewSeverity(this.severity),
             location: {
-                file: this.parent.fullPath,
+                file: this.parent.fileFullPath,
                 snippet: this._snippet,
                 row: this.regionWithIssue.start.line + 1,
                 column: this.regionWithIssue.start.character

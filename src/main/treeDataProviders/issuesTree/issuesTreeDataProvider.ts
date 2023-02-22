@@ -31,10 +31,6 @@ import { EnvironmentTreeNode } from './descriptorTree/environmentTreeNode';
 import { ProjectDependencyTreeNode } from './descriptorTree/projectDependencyTreeNode';
 import { ScanResults, DependencyScanResults, FileIssuesData } from '../../types/workspaceIssuesDetails';
 import { PypiUtils } from '../../utils/pypiUtils';
-import { EnvironmentTreeNode } from './descriptorTree/environmentTreeNode';
-import { ProjectDependencyTreeNode } from './descriptorTree/projectDependencyTreeNode';
-import { ScanResults, DependencyScanResults, FileIssuesData } from '../../types/workspaceIssuesDetails';
-import { PypiUtils } from '../../utils/pypiUtils';
 import { TerraformTreeNode } from './codeFileTree/terraformTreeNode';
 
 export interface ScanConfig {
