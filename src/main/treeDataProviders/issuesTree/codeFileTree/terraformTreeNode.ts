@@ -6,8 +6,6 @@ import { CodeFileTreeNode } from './codeFileTreeNode';
 import { CodeIssueTreeNode } from './codeIssueTreeNode';
 import { SeverityUtils } from '../../../types/severity';
 
-
-
 /**
  * Describe a Terraform (Iac) issue
  */
@@ -38,10 +36,10 @@ export class TerraformTreeNode extends CodeIssueTreeNode {
         return this._fullDescription;
     }
 
-      /**
+    /**
      * Get the CVE details page of the issue
      */
-      public getDetailsPage(): IIaCPage {
+    public getDetailsPage(): IIaCPage {
         return {
             pageType: PageType.IaC,
             header: this.label,

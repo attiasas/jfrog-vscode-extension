@@ -46,7 +46,13 @@ export class ScanResults {
      * @returns true if at least one issue exists
      */
     public hasIssues(): boolean {
-        return this.descriptorsIssues.length > 0 || this.eosScan?.filesWithIssues?.length > 0 || this.iacScan?.filesWithIssues?.length > 0 || this.secretsScan?.filesWithIssues?.length > 0 || !!this._workspaceIssues;
+        return (
+            this.descriptorsIssues.length > 0 ||
+            this.eosScan?.filesWithIssues?.length > 0 ||
+            this.iacScan?.filesWithIssues?.length > 0 ||
+            this.secretsScan?.filesWithIssues?.length > 0 ||
+            !!this._workspaceIssues
+        );
     }
 
     get path(): string {

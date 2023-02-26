@@ -32,7 +32,7 @@ export class TerraformRunner extends BinaryRunner {
         super(
             connectionManager,
             abortCheckInterval,
-            logManager,
+            logManager
             // path.join(ScanUtils.getHomePath(), TerraformRunner.BINARY_FOLDER, TerraformRunner.getBinaryName())
         );
     }
@@ -114,7 +114,10 @@ export class TerraformRunner extends BinaryRunner {
      */
     public generateIssueData(iacResponse: TerraformScanResponse, analyzeIssue: AnalyzeIssue, fullDescription?: string) {
         analyzeIssue.locations.forEach(location => {
-            let fileWithIssues: TerraformFileIssues = this.getOrCreateTerraformFileIssues(iacResponse, location.physicalLocation.artifactLocation.uri);
+            let fileWithIssues: TerraformFileIssues = this.getOrCreateTerraformFileIssues(
+                iacResponse,
+                location.physicalLocation.artifactLocation.uri
+            );
             let fileIssue: TerraformIssue = this.getOrCreateTerraformIssue(fileWithIssues, analyzeIssue, fullDescription);
             fileIssue.locations.push(location.physicalLocation.region);
         });

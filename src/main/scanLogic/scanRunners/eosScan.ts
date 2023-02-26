@@ -44,7 +44,7 @@ export class EosRunner extends BinaryRunner {
         super(
             connectionManager,
             abortCheckInterval,
-            logManager,
+            logManager
             // path.join(ScanUtils.getHomePath(), EosRunner.BINARY_FOLDER, EosRunner.getBinaryName())
         );
     }

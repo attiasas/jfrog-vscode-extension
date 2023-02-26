@@ -159,7 +159,7 @@ export class Translators {
         for (let locations of threadFlows) {
             let codeFlow: IAnalysisStep[] = [];
             for (let location of locations) {
-                const artifactLocation  : string = location.artifactLocation.uri;
+                const artifactLocation: string = location.artifactLocation.uri;
                 codeFlow.push({
                     fileName: Utils.getLastSegment(artifactLocation),
                     file: artifactLocation,
@@ -169,7 +169,7 @@ export class Translators {
                 } as IAnalysisStep);
             }
             result.push(codeFlow);
-        }        
+        }
         return result;
     }
 

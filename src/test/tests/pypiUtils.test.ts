@@ -49,7 +49,9 @@ describe('Pypi Utils Tests', async () => {
     });
 
     it('Match setup.py dependencies with regex', () => {
-        let dependencyToVersion: Map<string, string | undefined> = PypiUtils.getSetupPyDirectDependencies(path.join(tmpDir.fsPath, 'regex', 'setupNoDepFound.py'));
+        let dependencyToVersion: Map<string, string | undefined> = PypiUtils.getSetupPyDirectDependencies(
+            path.join(tmpDir.fsPath, 'regex', 'setupNoDepFound.py')
+        );
         assert.equal(dependencyToVersion.size, 0);
         dependencyToVersion = PypiUtils.getSetupPyDirectDependencies(path.join(tmpDir.fsPath, 'regex', 'setupOneDepFound.py'));
         assert.equal(dependencyToVersion.size, 1);
@@ -82,7 +84,9 @@ describe('Pypi Utils Tests', async () => {
         );
         assert.equal(dependencyToVersion.size, 0);
 
-        dependencyToVersion = PypiUtils.getRequirementsTxtDirectDependencies(path.join(tmpDir.fsPath, 'regex', 'requirementsAllKindOfDepsVariations.txt'));
+        dependencyToVersion = PypiUtils.getRequirementsTxtDirectDependencies(
+            path.join(tmpDir.fsPath, 'regex', 'requirementsAllKindOfDepsVariations.txt')
+        );
         assert.equal(dependencyToVersion.get('someproject1'), '');
         assert.equal(dependencyToVersion.get('some.project2'), '== 1.3');
         assert.equal(dependencyToVersion.get('someproject3'), '>= 1.2, < 2.0');

@@ -6,8 +6,6 @@ import { CodeIssueTreeNode } from './codeIssueTreeNode';
 import { SeverityUtils } from '../../../types/severity';
 import { SecretsIssue } from '../../../scanLogic/scanRunners/secretsScan';
 
-
-
 /**
  * Describe a Secrets issue
  */
@@ -38,10 +36,10 @@ export class SecretTreeNode extends CodeIssueTreeNode {
         return this._fullDescription;
     }
 
-      /**
+    /**
      * Get the CVE details page of the issue
      */
-      public getDetailsPage(): ISecretsPage {
+    public getDetailsPage(): ISecretsPage {
         return {
             pageType: PageType.Secrets,
             header: this.label,

@@ -301,14 +301,18 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
         checkCanceled();
         let eosSupported: boolean = !!this._currentScanConfig && this._currentScanConfig.eosScan && this._scanManager.validateEosSupported();
         let iacSupported: boolean = !!this._currentScanConfig && this._currentScanConfig.terraformScan && this._scanManager.validateIacSupported();
-        let secretsSupported: boolean = !!this._currentScanConfig && this._currentScanConfig.secretsScan && this._scanManager.validateSecretsSupported();
+        let secretsSupported: boolean =
+            !!this._currentScanConfig && this._currentScanConfig.secretsScan && this._scanManager.validateSecretsSupported();
         let graphSupported: boolean =
             !!this._currentScanConfig && this._currentScanConfig.dependencyScan && (await this._scanManager.validateGraphSupported());
         let applicableSupported: boolean =
             !!this._currentScanConfig && this._currentScanConfig.applicableScan && (await this._scanManager.validateApplicableSupported());
         checkCanceled();
         let totalSubSteps: number =
-            (graphSupported ? (applicableSupported ? 2 : 1) * descriptorsCount : 0) + (eosSupported ? 1 : 0) + (iacSupported ? 1 : 0)+ (secretsSupported ? 1 : 0);
+            (graphSupported ? (applicableSupported ? 2 : 1) * descriptorsCount : 0) +
+            (eosSupported ? 1 : 0) +
+            (iacSupported ? 1 : 0) +
+            (secretsSupported ? 1 : 0);
         progressManager.startStep('🔎 Scanning for issues', totalSubSteps);
         let scansPromises: Promise<any>[] = [];
 
@@ -321,7 +325,7 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
         if (secretsSupported) {
             scansPromises.push(AnalyzerUtils.runSecrets(scanResults, root, this._scanManager, progressManager));
         }
-       
+
         // Dependency graph scan and applicability scan for each descriptor
         if (graphSupported) {
             // Dependency graph scan and applicability scan for each descriptor
@@ -592,7 +596,13 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
     ): Promise<void> {
         let cveToScan: string[] = [];
         descriptorNode.issues.forEach(issue => {
-            if (issue instanceof CveTreeNode && !issue.parent.indirect && issue.cve && issue.cve.cve && !cveToScan.find(i => issue.cve && i == issue.cve.cve)) {
+            if (
+                issue instanceof CveTreeNode &&
+                !issue.parent.indirect &&
+                issue.cve &&
+                issue.cve.cve &&
+                !cveToScan.find(i => issue.cve && i == issue.cve.cve)
+            ) {
                 cveToScan.push(issue.cve.cve);
             }
         });
@@ -729,7 +739,12 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                 element.command = Utils.createNodeCommand('jfrog.view.details.page', 'Show details', [element.getDetailsPage()]);
             }
             // Source code issues nodes
-            if (element instanceof ApplicableTreeNode || element instanceof EosTreeNode || element instanceof TerraformTreeNode || element instanceof SecretTreeNode) {
+            if (
+                element instanceof ApplicableTreeNode ||
+                element instanceof EosTreeNode ||
+                element instanceof TerraformTreeNode ||
+                element instanceof SecretTreeNode
+            ) {
                 element.command = Utils.createNodeCommand('jfrog.issues.file.open.details', 'Open file location and show details', [
                     element.parent.projectFilePath,
                     element.regionWithIssue,

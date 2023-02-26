@@ -31,7 +31,7 @@ export class SecretsRunner extends BinaryRunner {
         super(
             connectionManager,
             abortCheckInterval,
-            logManager,
+            logManager
             // path.join(ScanUtils.getHomePath(), TerraformRunner.BINARY_FOLDER, TerraformRunner.getBinaryName())
         );
     }
