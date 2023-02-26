@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import fs from 'fs-extra';
-import { IDependencyPage, IEosPage } from 'jfrog-ide-webview';
+import { IDependencyPage, IEosPage, IIaCPage, ISecretsPage } from 'jfrog-ide-webview';
 import { LogManager } from '../log/logManager';
-import { TerraformTreeNode } from '../treeDataProviders/issuesTree/codeFileTree/terraformTreeNode';
-
 /**
  * Show a webview panel with details about objects in the project
  */
@@ -16,7 +14,7 @@ export class DetailsWebView {
 
     public async activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(
-            vscode.commands.registerCommand('jfrog.view.details.page', (page: IDependencyPage | IEosPage | TerraformTreeNode) => this.updateWebview(page, context))
+            vscode.commands.registerCommand('jfrog.view.details.page', (page: IDependencyPage | IEosPage | IIaCPage| ISecretsPage) => this.updateWebview(page, context))
         );
     }
 

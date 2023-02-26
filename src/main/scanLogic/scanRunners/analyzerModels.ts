@@ -2,7 +2,7 @@ export interface AnalyzerRequest {
     scans: AnalyzeScanRequest[];
 }
 
-type AnalyzerType = 'analyze-applicability' | 'analyze-codebase' | 'iac-scan-modules';
+type AnalyzerType = 'analyze-applicability' | 'analyze-codebase' | 'iac-scan-modules' | 'secrets-scan';
 export type SeverityLevel = 'none' | 'note' | 'warning' | 'error';
 type ResultKind = 'pass' | 'fail';
 

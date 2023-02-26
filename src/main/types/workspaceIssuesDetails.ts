@@ -2,6 +2,7 @@ import { IGraphResponse } from 'jfrog-client-js';
 import { IImpactGraph } from 'jfrog-ide-webview';
 import { ApplicabilityScanResponse } from '../scanLogic/scanRunners/applicabilityScan';
 import { EosScanResponse } from '../scanLogic/scanRunners/eosScan';
+import { SecretsScanResponse } from '../scanLogic/scanRunners/secretsScan';
 import { TerraformScanResponse } from '../scanLogic/scanRunners/terraformScan';
 import { PackageType } from './projectType';
 
@@ -15,6 +16,8 @@ export class ScanResults {
     private _eosScanTimestamp?: number;
     private _iacScan: TerraformScanResponse = {} as TerraformScanResponse;
     private _iacScanTimestamp?: number;
+    private _secretsScan: SecretsScanResponse = {} as SecretsScanResponse;
+    private _secretsScanTimestamp?: number;
     private _failedFiles: FileIssuesData[] = [];
 
     constructor(private _path: string) {}
@@ -30,6 +33,8 @@ export class ScanResults {
         workspaceIssuesDetails.eosScanTimestamp = tmp._eosScanTimestamp;
         workspaceIssuesDetails.iacScan = tmp._iacScan;
         workspaceIssuesDetails.iacScanTimestamp = tmp.iacScanTimestamp;
+        workspaceIssuesDetails.secretsScan = tmp._secretsScan;
+        workspaceIssuesDetails.secretsScanTimestamp = tmp.secretsScanTimestamp;
         if (tmp._failedFiles) {
             workspaceIssuesDetails.failedFiles.push(...tmp._failedFiles);
         }
@@ -41,7 +46,7 @@ export class ScanResults {
      * @returns true if at least one issue exists
      */
     public hasIssues(): boolean {
-        return this.descriptorsIssues.length > 0 || this.eosScan?.filesWithIssues?.length > 0 || this.iacScan?.filesWithIssues?.length > 0 || !!this._workspaceIssues;
+        return this.descriptorsIssues.length > 0 || this.eosScan?.filesWithIssues?.length > 0 || this.iacScan?.filesWithIssues?.length > 0 || this.secretsScan?.filesWithIssues?.length > 0 || !!this._workspaceIssues;
     }
 
     get path(): string {
@@ -94,6 +99,22 @@ export class ScanResults {
 
     set iacScanTimestamp(value: number | undefined) {
         this._iacScanTimestamp = value;
+    }
+
+    get secretsScan(): SecretsScanResponse {
+        return this._secretsScan;
+    }
+
+    set secretsScan(value: SecretsScanResponse) {
+        this._secretsScan = value;
+    }
+
+    get secretsScanTimestamp(): number | undefined {
+        return this._secretsScanTimestamp;
+    }
+
+    set secretsScanTimestamp(value: number | undefined) {
+        this._secretsScanTimestamp = value;
     }
 
     get failedFiles(): FileIssuesData[] {

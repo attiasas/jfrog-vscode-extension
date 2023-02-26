@@ -20,6 +20,8 @@ import { DependencyScanResults, ScanResults } from '../../types/workspaceIssuesD
 import { EosTreeNode } from '../issuesTree/codeFileTree/eosTreeNode';
 import { TerraformIssue } from '../../scanLogic/scanRunners/terraformScan';
 import { TerraformTreeNode } from '../issuesTree/codeFileTree/terraformTreeNode';
+import { SecretsIssue } from '../../scanLogic/scanRunners/secretsScan';
+import { SecretTreeNode } from '../issuesTree/codeFileTree/secretsTreeNode';
 
 export class AnalyzerUtils {
     /**
@@ -346,6 +348,64 @@ export class AnalyzerUtils {
                 fileWithIssues.issues.forEach((issue: TerraformIssue) => {
                     issue.locations.forEach((location: FileRegion) => {
                         fileNode.issues.push(new TerraformTreeNode(issue, location, fileNode));
+                        issuesCount++;
+                    });
+                });
+            });
+        }
+
+        return issuesCount;
+    }
+
+    public static async runSecrets(
+        workspaceData: ScanResults,
+        root: IssuesRootTreeNode,
+        scanManager: ScanManager,
+        progressManager: StepProgress
+    ): Promise<any> {
+        if (!scanManager.validateSecretsSupported()) {
+            progressManager.reportProgress();
+            return;
+        }
+        // Run
+        let startTime: number = Date.now();
+        workspaceData.secretsScan = await scanManager
+            .scanSecrets(root.workSpace.uri.fsPath, progressManager.abortController)
+            .finally(() => progressManager.reportProgress());
+        if (workspaceData.secretsScan) {
+            workspaceData.secretsScanTimestamp = Date.now();
+            let issuesCount: number = AnalyzerUtils.populateSecretsIssues(root, workspaceData);
+            scanManager.logManager.logMessage(
+                'Found ' +
+                    issuesCount +
+                    " Secrets issues in workspace = '" +
+                    workspaceData.path +
+                    "' (elapsed " +
+                    (Date.now() - startTime) / 1000 +
+                    ' seconds)',
+                'INFO'
+            );
+
+            root.apply();
+            progressManager.onProgress();
+        }
+    }
+
+    /**
+     * Populate Secrets information in
+     * @param root - root node to populate data inside
+     * @param workspaceData - data to populate on node
+     * @returns number of Secrets issues populated
+     */
+    public static populateSecretsIssues(root: IssuesRootTreeNode, workspaceData: ScanResults): number {
+        root.secretsScanTimeStamp = workspaceData.secretsScanTimestamp;
+        let issuesCount: number = 0;
+        if (workspaceData.secretsScan && workspaceData.secretsScan.filesWithIssues) {
+            workspaceData.secretsScan.filesWithIssues.forEach(fileWithIssues => {
+                let fileNode: CodeFileTreeNode = this.getOrCreateCodeFileNode(root, fileWithIssues.full_path);
+                fileWithIssues.issues.forEach((issue: SecretsIssue) => {
+                    issue.locations.forEach((location: FileRegion) => {
+                        fileNode.issues.push(new SecretTreeNode(issue, location, fileNode));
                         issuesCount++;
                     });
                 });

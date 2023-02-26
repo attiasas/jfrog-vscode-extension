@@ -157,6 +157,16 @@
                 "enablement": "jfrog.connection.status == signedIn && !jfrog.scanInProgress"
             },
             {
+                "command": "jfrog.issues.scan.secrets",
+                "title": "Scan for Secrets issues",
+                "icon": {
+                    "light": "resources/light/refresh.png",
+                    "dark": "resources/dark/refresh.png"
+                },
+                "category": "JFrog",
+                "enablement": "jfrog.connection.status == signedIn && !jfrog.scanInProgress"
+            },
+            {
                 "command": "jfrog.issues.clear",
                 "title": "Clear all the issues",
                 "category": "JFrog",
@@ -222,12 +232,12 @@
             "view/title": [
                 {
                     "command": "jfrog.xray.connect",
-                    "when": "jfrog.connection.status != signedIn",
+                    "when": "jfrog.connection.status != signedIn && view =~ /jfrog.issues|jfrog.xray.ci.issues/",
                     "group": "navigation@0"
                 },
                 {
                     "command": "jfrog.xray.disconnect",
-                    "when": "jfrog.connection.status == signedIn",
+                    "when": "jfrog.connection.status == signedIn && view =~ /jfrog.issues|jfrog.xray.ci.issues/",
                     "group": "navigation@0"
                 },
                 {

@@ -7,16 +7,16 @@ import { BinaryRunner } from './binaryRunner';
 import { Severity } from '../../types/severity';
 import { Translators } from '../../utils/translators';
 
-export interface TerraformScanResponse {
-    filesWithIssues: TerraformFileIssues[];
+export interface SecretsScanResponse {
+    filesWithIssues: SecretsFileIssues[];
 }
 
-export interface TerraformFileIssues {
+export interface SecretsFileIssues {
     full_path: string;
-    issues: TerraformIssue[];
+    issues: SecretsIssue[];
 }
 
-export interface TerraformIssue {
+export interface SecretsIssue {
     ruleId: string;
     severity: Severity;
     ruleName: string;
@@ -24,9 +24,8 @@ export interface TerraformIssue {
     locations: FileRegion[];
 }
 
-export class TerraformRunner extends BinaryRunner {
-    // private static readonly BINARY_FOLDER: string = 'terraform';
-    private static readonly BINARY_NAME: string = 'tf_scanner';
+export class SecretsRunner extends BinaryRunner {
+    private static readonly BINARY_NAME: string = 'secrets_scanner';
 
     constructor(connectionManager: ConnectionManager, abortCheckInterval: number, logManager: LogManager) {
         super(
@@ -47,7 +46,7 @@ export class TerraformRunner extends BinaryRunner {
 
     /** @override */
     protected static getBinaryName(): string {
-        let name: string = TerraformRunner.BINARY_NAME;
+        let name: string = SecretsRunner.BINARY_NAME;
         switch (os.platform()) {
             case 'linux':
                 return name + '_ubuntu';
@@ -61,7 +60,7 @@ export class TerraformRunner extends BinaryRunner {
 
     /** @override */
     public async runBinary(abortSignal: AbortSignal, yamlConfigPath: string): Promise<void> {
-        await this.executeBinary(abortSignal, ['iac', yamlConfigPath]);
+        await this.executeBinary(abortSignal, ['sec', yamlConfigPath]);
     }
 
     /**
@@ -70,9 +69,9 @@ export class TerraformRunner extends BinaryRunner {
      * @param requests - requests to run
      * @returns the response generated from the scan
      */
-    public async scan(abortController: AbortController, directory: string): Promise<TerraformScanResponse> {
+    public async scan(abortController: AbortController, directory: string): Promise<SecretsScanResponse> {
         let request: AnalyzeScanRequest = {
-            type: 'iac-scan-modules',
+            type: 'secrets-scan',
             roots: [directory]
         } as AnalyzeScanRequest;
         return await this.run(abortController, true, request).then(runResult => this.generateScanResponse(runResult));
@@ -83,13 +82,13 @@ export class TerraformRunner extends BinaryRunner {
      * @param run - the run results generated from the binary
      * @returns the response generated from the scan run
      */
-    public generateScanResponse(response?: AnalyzerScanResponse): TerraformScanResponse {
+    public generateScanResponse(response?: AnalyzerScanResponse): SecretsScanResponse {
         if (!response) {
-            return {} as TerraformScanResponse;
+            return {} as SecretsScanResponse;
         }
-        let iacResponse: TerraformScanResponse = {
+        let iacResponse: SecretsScanResponse = {
             filesWithIssues: []
-        } as TerraformScanResponse;
+        } as SecretsScanResponse;
 
         for (const run of response.runs) {
             // Prepare
@@ -112,10 +111,10 @@ export class TerraformRunner extends BinaryRunner {
      * @param analyzeIssue - the issue to handle and generate information base on it
      * @param fullDescription - the description of the analyzeIssue
      */
-    public generateIssueData(iacResponse: TerraformScanResponse, analyzeIssue: AnalyzeIssue, fullDescription?: string) {
+    public generateIssueData(iacResponse: SecretsScanResponse, analyzeIssue: AnalyzeIssue, fullDescription?: string) {
         analyzeIssue.locations.forEach(location => {
-            let fileWithIssues: TerraformFileIssues = this.getOrCreateTerraformFileIssues(iacResponse, location.physicalLocation.artifactLocation.uri);
-            let fileIssue: TerraformIssue = this.getOrCreateTerraformIssue(fileWithIssues, analyzeIssue, fullDescription);
+            let fileWithIssues: SecretsFileIssues = this.getOrCreateSecretsFileIssues(iacResponse, location.physicalLocation.artifactLocation.uri);
+            let fileIssue: SecretsIssue = this.getOrCreateSecretsIssue(fileWithIssues, analyzeIssue, fullDescription);
             fileIssue.locations.push(location.physicalLocation.region);
         });
     }
@@ -127,18 +126,18 @@ export class TerraformRunner extends BinaryRunner {
      * @param fullDescription - the description of the issue
      * @returns - the eos issue
      */
-    private getOrCreateTerraformIssue(fileWithIssues: TerraformFileIssues, analyzeIssue: AnalyzeIssue, fullDescription?: string): TerraformIssue {
-        let potential: TerraformIssue | undefined = fileWithIssues.issues.find(issue => issue.ruleId === analyzeIssue.ruleId);
+    private getOrCreateSecretsIssue(fileWithIssues: SecretsFileIssues, analyzeIssue: AnalyzeIssue, fullDescription?: string): SecretsIssue {
+        let potential: SecretsIssue | undefined = fileWithIssues.issues.find(issue => issue.ruleId === analyzeIssue.ruleId);
         if (potential) {
             return potential;
         }
-        let fileIssue: TerraformIssue = {
+        let fileIssue: SecretsIssue = {
             ruleId: analyzeIssue.ruleId,
             severity: Translators.levelToSeverity(analyzeIssue.level),
             ruleName: analyzeIssue.message.text,
             fullDescription: fullDescription,
             locations: []
-        } as TerraformIssue;
+        } as SecretsIssue;
         fileWithIssues.issues.push(fileIssue);
         return fileIssue;
     }
@@ -149,15 +148,15 @@ export class TerraformRunner extends BinaryRunner {
      * @param uri - the files to search or create
      * @returns - file with issues
      */
-    private getOrCreateTerraformFileIssues(response: TerraformScanResponse, uri: string): TerraformFileIssues {
-        let potential: TerraformFileIssues | undefined = response.filesWithIssues.find(fileWithIssues => fileWithIssues.full_path === uri);
+    private getOrCreateSecretsFileIssues(response: SecretsScanResponse, uri: string): SecretsFileIssues {
+        let potential: SecretsFileIssues | undefined = response.filesWithIssues.find(fileWithIssues => fileWithIssues.full_path === uri);
         if (potential) {
             return potential;
         }
-        let fileWithIssues: TerraformFileIssues = {
+        let fileWithIssues: SecretsFileIssues = {
             full_path: uri,
             issues: []
-        } as TerraformFileIssues;
+        } as SecretsFileIssues;
         response.filesWithIssues.push(fileWithIssues);
 
         return fileWithIssues;

@@ -12,6 +12,7 @@ import { EosRunner, EosScanRequest, EosScanResponse } from './scanRunners/eosSca
 import { AnalyzerUtils } from '../treeDataProviders/utils/analyzerUtils';
 import { Configuration } from '../utils/configuration';
 import { TerraformRunner, TerraformScanResponse } from './scanRunners/terraformScan';
+import { SecretsRunner, SecretsScanResponse } from './scanRunners/secretsScan';
 
 /**
  * Manage all the Xray scans
@@ -59,6 +60,13 @@ export class ScanManager implements ExtensionComponent {
      */
     public validateIacSupported(): boolean {
         return new TerraformRunner(this._connectionManager, ScanManager.BINARY_ABORT_CHECK_INTERVAL, this._logManager).isSupported;
+    }
+
+    /**
+     * Validate if the secrets-scan is supported
+     */
+    public validateSecretsSupported(): boolean {
+        return new SecretsRunner(this._connectionManager, ScanManager.BINARY_ABORT_CHECK_INTERVAL, this._logManager).isSupported;
     }
 
     /**
@@ -124,5 +132,15 @@ export class ScanManager implements ExtensionComponent {
         }
         this._logManager.logMessage('Scanning for Iac issues, root: ' + directory, 'DEBUG');
         return iacRunner.scan(abortController, directory);
+    }
+
+    public async scanSecrets(directory: string, abortController: AbortController): Promise<SecretsScanResponse> {
+        let secretsRunner: SecretsRunner = new SecretsRunner(this._connectionManager, ScanManager.BINARY_ABORT_CHECK_INTERVAL, this._logManager);
+        if (!secretsRunner.isSupported) {
+            this._logManager.logMessage('Secrets scan is not supported', 'DEBUG');
+            return {} as SecretsScanResponse;
+        }
+        this._logManager.logMessage('Scanning for Secrets issues, root: ' + directory, 'DEBUG');
+        return secretsRunner.scan(abortController, directory);
     }
 }

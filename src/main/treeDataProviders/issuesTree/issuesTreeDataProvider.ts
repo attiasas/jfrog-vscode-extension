@@ -32,11 +32,13 @@ import { ProjectDependencyTreeNode } from './descriptorTree/projectDependencyTre
 import { ScanResults, DependencyScanResults, FileIssuesData } from '../../types/workspaceIssuesDetails';
 import { PypiUtils } from '../../utils/pypiUtils';
 import { TerraformTreeNode } from './codeFileTree/terraformTreeNode';
+import { SecretTreeNode } from './codeFileTree/secretsTreeNode';
 
 export interface ScanConfig {
     dependencyScan: boolean;
     applicableScan: boolean;
     terraformScan: boolean;
+    secretsScan: boolean;
     eosScan: boolean;
 }
 
@@ -299,16 +301,27 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
         checkCanceled();
         let eosSupported: boolean = !!this._currentScanConfig && this._currentScanConfig.eosScan && this._scanManager.validateEosSupported();
         let iacSupported: boolean = !!this._currentScanConfig && this._currentScanConfig.terraformScan && this._scanManager.validateIacSupported();
+        let secretsSupported: boolean = !!this._currentScanConfig && this._currentScanConfig.secretsScan && this._scanManager.validateSecretsSupported();
         let graphSupported: boolean =
             !!this._currentScanConfig && this._currentScanConfig.dependencyScan && (await this._scanManager.validateGraphSupported());
         let applicableSupported: boolean =
             !!this._currentScanConfig && this._currentScanConfig.applicableScan && (await this._scanManager.validateApplicableSupported());
         checkCanceled();
         let totalSubSteps: number =
-            (graphSupported ? (applicableSupported ? 2 : 1) * descriptorsCount : 0) + (eosSupported ? 1 : 0) + (iacSupported ? 1 : 0);
+            (graphSupported ? (applicableSupported ? 2 : 1) * descriptorsCount : 0) + (eosSupported ? 1 : 0) + (iacSupported ? 1 : 0)+ (secretsSupported ? 1 : 0);
         progressManager.startStep('🔎 Scanning for issues', totalSubSteps);
         let scansPromises: Promise<any>[] = [];
-        scansPromises.push(AnalyzerUtils.runEos(scanResults, root, workspaceDescriptors, this._scanManager, progressManager));
+
+        if (eosSupported) {
+            scansPromises.push(AnalyzerUtils.runEos(scanResults, root, workspaceDescriptors, this._scanManager, progressManager));
+        }
+        if (iacSupported) {
+            scansPromises.push(AnalyzerUtils.runIac(scanResults, root, this._scanManager, progressManager));
+        }
+        if (secretsSupported) {
+            scansPromises.push(AnalyzerUtils.runSecrets(scanResults, root, this._scanManager, progressManager));
+        }
+       
         // Dependency graph scan and applicability scan for each descriptor
         if (graphSupported) {
             // Dependency graph scan and applicability scan for each descriptor
@@ -324,12 +337,6 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                     this.scanDependencies(scanResults, root, workspaceDescriptors, workspaceDependenciesTree, progressManager, checkCanceled)
                 )
             );
-        }
-        if (eosSupported) {
-            scansPromises.push(AnalyzerUtils.runEos(scanResults, root, workspaceDescriptors, this._scanManager, progressManager));
-        }
-        if (iacSupported) {
-            scansPromises.push(AnalyzerUtils.runIac(scanResults, root, this._scanManager, progressManager));
         }
 
         await Promise.all(scansPromises);
@@ -722,7 +729,7 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                 element.command = Utils.createNodeCommand('jfrog.view.details.page', 'Show details', [element.getDetailsPage()]);
             }
             // Source code issues nodes
-            if (element instanceof ApplicableTreeNode || element instanceof EosTreeNode || element instanceof TerraformTreeNode) {
+            if (element instanceof ApplicableTreeNode || element instanceof EosTreeNode || element instanceof TerraformTreeNode || element instanceof SecretTreeNode) {
                 element.command = Utils.createNodeCommand('jfrog.issues.file.open.details', 'Open file location and show details', [
                     element.parent.projectFilePath,
                     element.regionWithIssue,
