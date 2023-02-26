@@ -207,6 +207,10 @@ export class IssuesTreeDataProvider implements vscode.TreeDataProvider<IssuesRoo
                 root.iacScanTimeStamp = scanResults.iacScanTimestamp;
                 AnalyzerUtils.populateIacIssues(root, scanResults);
             }
+            if (scanResults.secretsScan) {
+                root.secretsScanTimeStamp = scanResults.secretsScanTimestamp;
+                AnalyzerUtils.populateSecretsIssues(root, scanResults);
+            }
             return root;
         }
         return undefined;

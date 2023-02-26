@@ -100,7 +100,7 @@ export class CodeFileActionProvider extends AbstractFileActionProvider implement
         let topSeverities: Map<vscode.Range, Severity> = this.filterByTopSeverity(issues);
         const textEditor: vscode.TextEditor = await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
         for (const [region, severity] of topSeverities) {
-            this.addGutter(textEditor, SeverityUtils.getIcon(severity), region);
+            this.addGutter(textEditor, SeverityUtils.getIcon(severity), new vscode.Range(region.start,region.start));
         }
     }
 
