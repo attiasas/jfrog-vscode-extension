@@ -23,6 +23,9 @@ jobs:
               with:
                 maven-version: 3.9.1
               if: runner.os == 'macOS'
+            - name: Use Maven 3.9.1
+              run: echo "export PATH=\"/usr/local/Cellar/maven@3.9.1/3.9.1/bin:\$PATH\"" >> $GITHUB_ENV
+              if: runner.os == 'macOS'
             - uses: actions/setup-python@v1
             - name: Setup NodeJS
               uses: actions/setup-node@v2
