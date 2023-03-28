@@ -23,10 +23,10 @@ jobs:
               with:
                 java-version: '11'
               if: runner.os == 'macOS'
-            - name: Set up Maven
+            - name: Set up Maven 3.9.1
               uses: stCarolas/setup-maven@v4.5
               with:
-                maven-version: 3.8.7
+                maven-version: 3.9.1
               if: runner.os == 'macOS'
             - uses: actions/setup-python@v1
             - name: Setup NodeJS
