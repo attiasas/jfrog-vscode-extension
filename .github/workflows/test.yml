@@ -18,11 +18,6 @@ jobs:
               # Fix 'nvm is not compatible with the npm config "prefix" option' error on macOS
               run: unset npm_config_prefix
               if: runner.os == 'macOS'
-            - name: Set up Java
-              uses: actions/setup-java@v2
-              with:
-                java-version: '11'
-              if: runner.os == 'macOS'
             - name: Set up Maven 3.9.1
               uses: stCarolas/setup-maven@v4.5
               with:
