@@ -16,12 +16,9 @@ jobs:
                 ref: ${{ github.event.pull_request.head.sha }}
             - name: Setup macOS
               # Fix 'nvm is not compatible with the npm config "prefix" option' error on macOS
-              run: unset npm_config_prefix
-              if: runner.os == 'macOS'
-            - uses: actions/setup-java@v2
-              with:
-                java-version: '11'
-                maven-version: '3.9.1'
+              run: |
+                unset npm_config_prefix &&
+                export MAVEN_OPTS="-Dmaven.version=3.9.1"
               if: runner.os == 'macOS'
             - uses: actions/setup-python@v1
             - name: Setup NodeJS
