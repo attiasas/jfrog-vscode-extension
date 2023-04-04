@@ -40,9 +40,14 @@ export interface AnalyzeIssue {
     ruleId: string;
     kind?: ResultKind;
     level?: SeverityLevel;
+    suppressions?: AnalyzeSuppression[];
     message: ResultContent;
     locations: AnalyzeLocation[];
     codeFlows?: CodeFlow[];
+}
+
+export interface AnalyzeSuppression {
+    kind: string;
 }
 
 export interface CodeFlow {

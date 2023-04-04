@@ -112,7 +112,13 @@ export class EosRunner extends BinaryRunner {
                 }
             }
             // Generate response data
-            run.results?.forEach(analyzeIssue => this.generateIssueData(eosResponse, analyzeIssue, rulesFullDescription.get(analyzeIssue.ruleId)));
+            run.results?.forEach((analyzeIssue : AnalyzeIssue) => {
+                if(analyzeIssue.suppressions && analyzeIssue.suppressions.length > 0) {
+                    // Suppress issue
+                    return;
+                }
+                this.generateIssueData(eosResponse, analyzeIssue, rulesFullDescription.get(analyzeIssue.ruleId));
+            });
         }
         return eosResponse;
     }
