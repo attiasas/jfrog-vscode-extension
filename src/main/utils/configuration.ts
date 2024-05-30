@@ -98,7 +98,7 @@ export class Configuration {
     public static getLogLevel(): LogLevel {
         return vscode.workspace
             .getConfiguration(this.jfrogSectionConfigurationKey)
-            .get('logLevel', 'info')
+            .get('logLevel', 'debug')
             .toUpperCase() as LogLevel;
     }
 
