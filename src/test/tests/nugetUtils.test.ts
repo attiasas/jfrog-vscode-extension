@@ -42,9 +42,14 @@ describe('Nuget Utils Tests', async () => {
     before(() => {
         workspaceFolders = [
             {
-                uri: tmpDir,
+                uri: vscode.Uri.file(path.join(tmpDir.fsPath, 'assets')),
                 name: '',
                 index: 0
+            } as vscode.WorkspaceFolder,
+            {
+                uri: vscode.Uri.file(path.join(tmpDir.fsPath, 'empty')),
+                name: '',
+                index: 1
             } as vscode.WorkspaceFolder
         ];
         replacePackagesPathInAssets();
