@@ -10,7 +10,8 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectName": "included"
+      "projectName": "included",
+      "packagesPath": "/tmp"
     },
     "frameworks": {
       "net45": {
