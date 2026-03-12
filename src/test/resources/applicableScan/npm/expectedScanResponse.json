@@ -31,7 +31,7 @@
                             "endColumn": 74,
                             "endLine": 23,
                             "snippet": {
-                                "text": "protobuf.load(\"/path/to/untrusted.proto\", function(err, root) { return })"
+                                "text": "protobuf.parse(p)\nprotobuf.load(\"/path/to/untrusted.proto\", function(err, root) { return })"
                             },
                             "startColumn": 1,
                             "startLine": 23
