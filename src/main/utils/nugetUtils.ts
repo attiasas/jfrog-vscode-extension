@@ -103,13 +103,20 @@ export class NugetUtils {
             return null;
         }
 
-        if (!nugetList.projects || (projectsInSolutions && projectsInSolutions.length !== nugetList.projects.length)) {
+        if (!nugetList.projects || nugetList.projects.length === 0) {
             logManager.logError(new Error('No projects found for solution "' + solution.fsPath + '".'), true);
             logManager.logMessageAndToastErr(
                 `Failed to scan NuGet project. Hint: Please make sure the commands 'dotnet restore' or 'nuget restore' run successfully for '${solution.fsPath}'`,
                 'ERR'
             );
             return null;
+        }
+        if (projectsInSolutions && projectsInSolutions.length !== nugetList.projects.length) {
+            logManager.logMessage(
+                `Solution "${path.basename(solution.fsPath)}" has ${nugetList.projects.length} projects with dependency data, ` +
+                    `but ${projectsInSolutions.length} .csproj files found in workspace. Scanning available projects.`,
+                'WARN'
+            );
         }
 
         return nugetList;

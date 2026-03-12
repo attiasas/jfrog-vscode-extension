@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.5": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.5": []
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectName": "included"
+    },
+    "frameworks": {
+      "net45": {
+        "dependencies": {}
+      }
+    }
+  }
+}
