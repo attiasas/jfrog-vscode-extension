@@ -80,6 +80,9 @@ describe('Analyzer Utils Tests', async () => {
         it('Should process valid locations correctly', () => {
             const response: { filesWithIssues: any[] } = { filesWithIssues: [] };
             const analyzeIssue: any = {
+                ruleId: 'CVE-TEST-001',
+                level: 'error',
+                message: { text: 'test rule name' },
                 locations: [
                     {
                         physicalLocation: {
