@@ -18,7 +18,7 @@ import { DependenciesTreeNode } from '../../main/treeDataProviders/dependenciesT
 import { DependencyIssuesTreeNode } from '../../main/treeDataProviders/issuesTree/descriptorTree/dependencyIssuesTreeNode';
 import { IssueTreeNode } from '../../main/treeDataProviders/issuesTree/issueTreeNode';
 
-describe.only('Dependency Utils Tests', () => {
+describe('Dependency Utils Tests', () => {
     let logManager: LogManager = new LogManager().activate();
 
     const scanResponses: string = path.join(__dirname, '..', 'resources', 'scanResponses');

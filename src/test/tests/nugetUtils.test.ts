@@ -42,9 +42,14 @@ describe('Nuget Utils Tests', async () => {
     before(() => {
         workspaceFolders = [
             {
-                uri: tmpDir,
+                uri: vscode.Uri.file(path.join(tmpDir.fsPath, 'assets')),
                 name: '',
                 index: 0
+            } as vscode.WorkspaceFolder,
+            {
+                uri: vscode.Uri.file(path.join(tmpDir.fsPath, 'empty')),
+                name: '',
+                index: 1
             } as vscode.WorkspaceFolder
         ];
         replacePackagesPathInAssets();
@@ -84,6 +89,31 @@ describe('Nuget Utils Tests', async () => {
         node = res.find(child => child.label === 'empty.sln');
         assert.isDefined(node);
         assert.deepEqual(node?.children.length ?? 1, 0);
+    });
+
+    /**
+     * Test that a solution with a .csproj count mismatch (orphaned .csproj in workspace not
+     * referenced by the .sln) still scans the available projects instead of failing with [Not Installed].
+     */
+    it('Create NuGet Dependencies Trees - tolerates .csproj count mismatch', async () => {
+        const partialDir: vscode.Uri = vscode.Uri.file(path.join(tmpDir.fsPath, 'partial'));
+        const partialFolders: vscode.WorkspaceFolder[] = [{ uri: partialDir, name: '', index: 0 }];
+        const packageDescriptors: Map<PackageType, vscode.Uri[]> = await ScanUtils.locatePackageDescriptors(
+            partialFolders,
+            treesManager.logManager
+        );
+        const solutions: vscode.Uri[] | undefined = packageDescriptors.get(PackageType.Nuget);
+        assert.isDefined(solutions);
+
+        const parent: DependenciesTreeNode = new DependenciesTreeNode(new GeneralInfo('parent', '1.0.0', [], '', PackageType.Unknown));
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        await NugetUtils.createDependenciesTrees(solutions, treesManager.logManager, () => {}, parent);
+
+        // 'included' project should be scanned; no [Not Installed] solution node
+        assert.equal(parent.children.length, 1, 'Expected 1 child (included project), not a solution-level error node');
+        const includedNode: DependenciesTreeNode = parent.children[0];
+        assert.equal(includedNode.label, 'included', 'Expected the included project to be scanned');
+        assert.equal(includedNode.children.length, 0, 'Expected 0 NuGet dependencies for included');
     });
 
     async function runCreateNugetDependenciesTrees(parent: DependenciesTreeNode): Promise<DependenciesTreeNode[]> {
