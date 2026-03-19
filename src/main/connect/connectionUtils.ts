@@ -430,8 +430,14 @@ export class ConnectionUtils {
             return false;
         }
 
+        let proxyUri: URL;
+        try {
+            proxyUri = new URL(httpProxy);
+        } catch {
+            return false;
+        }
+
         let proxyConfig: IProxyConfig = {} as IProxyConfig;
-        let proxyUri: URL = new URL(httpProxy);
         proxyConfig.protocol = proxyUri.protocol;
         proxyConfig.host = proxyUri.hostname;
         if (proxyUri.port) {

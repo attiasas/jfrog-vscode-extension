@@ -85,6 +85,11 @@ describe('Analyzer BinaryRunner tests', async () => {
         })(connection, logManager);
     }
 
+    afterEach(() => {
+        delete process.env['HTTP_PROXY'];
+        delete process.env['HTTPS_PROXY'];
+    });
+
     [
         {
             name: 'With password credentials',
@@ -123,7 +128,7 @@ describe('Analyzer BinaryRunner tests', async () => {
             user: '',
             pass: '',
             token: 'access-token',
-            proxy: 'proxyUrlEnvVarValue',
+            proxy: 'http://proxy.example.com:8080',
             logPath: undefined
         },
         {
@@ -139,8 +144,14 @@ describe('Analyzer BinaryRunner tests', async () => {
     ].forEach(test => {
         it('Create environment variables for execution - ' + test.name, () => {
             let runner: AnalyzerManager = createDummyAnalyzerManager(createBinaryRunnerConnectionManager(test.url, test.user, test.pass, test.token));
-            process.env['HTTP_PROXY'] = test.proxy;
-            process.env['HTTPS_PROXY'] = test.proxy;
+            
+            if (test.proxy !== undefined) {
+                process.env['HTTP_PROXY'] = test.proxy;
+                process.env['HTTPS_PROXY'] = test.proxy;
+            } else {
+                delete process.env['HTTP_PROXY'];
+                delete process.env['HTTPS_PROXY'];
+            }
 
             let envVars: NodeJS.ProcessEnv | undefined = runner.createEnvForRun({ executionLogDirectory: test.logPath });
             if (test.shouldFail) {
