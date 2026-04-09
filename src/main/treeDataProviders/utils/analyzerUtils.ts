@@ -84,11 +84,14 @@ export class AnalyzerUtils {
 
     /**
      * Generate the data for a specific analyze issue (the file object, the issue in the file object and all the location objects of this issue).
-     * @param iacResponse - the response of the scan that holds all the file objects
+     * @param response - the response of the scan that holds all the file objects
      * @param analyzeIssue - the issue to handle and generate information base on it
      * @param fullDescription - the description of the analyzeIssue
      */
     public static generateIssueData(response: { filesWithIssues: FileWithSecurityIssues[] }, analyzeIssue: AnalyzeIssue, fullDescription?: string) {
+        if (!analyzeIssue || !analyzeIssue.locations || analyzeIssue.locations.length === 0) {
+            return;
+        }
         analyzeIssue.locations.forEach(location => {
             if (location?.physicalLocation?.artifactLocation?.uri) {
                 let fileWithIssues: FileWithSecurityIssues = AnalyzerUtils.getOrCreateFileWithSecurityIssues(
