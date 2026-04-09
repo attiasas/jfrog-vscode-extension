@@ -203,7 +203,7 @@ describe('Secrets Scan Tests', () => {
             );
             assert.isDefined(response.filesWithIssues);
             assert.equal(response.filesWithIssues.length, 1);
-            assert.equal(response.filesWithIssues[0].full_path, '/test/file.js');
+            assert.equal(response.filesWithIssues[0].full_path, 'file:///test/file.js');
         });
     });
 
