@@ -77,6 +77,40 @@ describe('Analyzer Utils Tests', async () => {
             assert.equal(response.filesWithIssues.length, 0);
         });
 
+        it('Should handle undefined analyzeIssue without errors', () => {
+            const response: { filesWithIssues: any[] } = { filesWithIssues: [] };
+            assert.doesNotThrow(() => {
+                AnalyzerUtils.generateIssueData(response, undefined as any);
+            });
+            assert.equal(response.filesWithIssues.length, 0);
+        });
+
+        it('Should handle null analyzeIssue without errors', () => {
+            const response: { filesWithIssues: any[] } = { filesWithIssues: [] };
+            assert.doesNotThrow(() => {
+                AnalyzerUtils.generateIssueData(response, null as any);
+            });
+            assert.equal(response.filesWithIssues.length, 0);
+        });
+
+        it('Should handle analyzeIssue with undefined locations without errors', () => {
+            const response: { filesWithIssues: any[] } = { filesWithIssues: [] };
+            const analyzeIssue: any = { ruleId: 'test-rule', message: { text: 'test' } };
+            assert.doesNotThrow(() => {
+                AnalyzerUtils.generateIssueData(response, analyzeIssue);
+            });
+            assert.equal(response.filesWithIssues.length, 0);
+        });
+
+        it('Should handle analyzeIssue with empty locations array without errors', () => {
+            const response: { filesWithIssues: any[] } = { filesWithIssues: [] };
+            const analyzeIssue: any = { ruleId: 'test-rule', message: { text: 'test' }, locations: [] };
+            assert.doesNotThrow(() => {
+                AnalyzerUtils.generateIssueData(response, analyzeIssue);
+            });
+            assert.equal(response.filesWithIssues.length, 0);
+        });
+
         it('Should process valid locations correctly', () => {
             const response: { filesWithIssues: any[] } = { filesWithIssues: [] };
             const analyzeIssue: any = {

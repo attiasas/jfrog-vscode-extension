@@ -3,7 +3,7 @@ import * as path from 'path';
 import { assert } from 'chai';
 import { ConnectionManager } from '../../main/connect/connectionManager';
 import { LogManager } from '../../main/log/logManager';
-import { FileRegion } from '../../main/scanLogic/scanRunners/analyzerModels';
+import { AnalyzerScanResponse, FileRegion } from '../../main/scanLogic/scanRunners/analyzerModels';
 import { SecretsRunner, SecretsScanResponse } from '../../main/scanLogic/scanRunners/secretsScan';
 import { CodeFileTreeNode } from '../../main/treeDataProviders/issuesTree/codeFileTree/codeFileTreeNode';
 import { CodeIssueTreeNode } from '../../main/treeDataProviders/issuesTree/codeFileTree/codeIssueTreeNode';
@@ -120,6 +120,90 @@ describe('Secrets Scan Tests', () => {
 
                 it('Check snippet text at location transferred', () => assertIssuesSnippet(testRoot, expectedFilesWithIssues, getTestIssueNode));
             });
+        });
+    });
+
+    describe('Secrets scan skips informational and empty-location issues', () => {
+        function createResponseWithResults(results: any[]): AnalyzerScanResponse {
+            return {
+                runs: [
+                    {
+                        tool: { driver: { name: 'JFrog Secrets scanner', rules: [{ id: 'generic' }] } },
+                        results: results
+                    }
+                ]
+            } as AnalyzerScanResponse;
+        }
+
+        const validResult: any = {
+            ruleId: 'generic',
+            message: { text: 'Hardcoded secrets were found' },
+            kind: 'fail',
+            locations: [
+                {
+                    physicalLocation: {
+                        artifactLocation: { uri: 'file:///test/file.js' },
+                        region: { startLine: 1, endLine: 1, startColumn: 1, endColumn: 10, snippet: { text: 'secret123' } }
+                    }
+                }
+            ]
+        };
+
+        it('Informational issues are skipped', () => {
+            const informationalResult: any = {
+                ruleId: 'generic',
+                message: { text: 'Informational finding' },
+                kind: 'informational',
+                locations: [
+                    {
+                        physicalLocation: {
+                            artifactLocation: { uri: 'file:///test/info.js' },
+                            region: { startLine: 1, endLine: 1, startColumn: 1, endColumn: 10, snippet: { text: 'data' } }
+                        }
+                    }
+                ]
+            };
+            const response: SecretsScanResponse = getDummyRunner().convertResponse(createResponseWithResults([informationalResult]));
+            assert.isDefined(response.filesWithIssues);
+            assert.equal(response.filesWithIssues.length, 0);
+        });
+
+        it('Empty-location issues are skipped', () => {
+            const emptyLocationsResult: any = {
+                ruleId: 'generic',
+                message: { text: 'Issue with no locations' },
+                locations: []
+            };
+            const response: SecretsScanResponse = getDummyRunner().convertResponse(createResponseWithResults([emptyLocationsResult]));
+            assert.isDefined(response.filesWithIssues);
+            assert.equal(response.filesWithIssues.length, 0);
+        });
+
+        it('Mixed: only actionable issues are kept', () => {
+            const informationalResult: any = {
+                ruleId: 'generic',
+                message: { text: 'Informational finding' },
+                kind: 'informational',
+                locations: [
+                    {
+                        physicalLocation: {
+                            artifactLocation: { uri: 'file:///test/info.js' },
+                            region: { startLine: 1, endLine: 1, startColumn: 1, endColumn: 10, snippet: { text: 'data' } }
+                        }
+                    }
+                ]
+            };
+            const emptyLocationsResult: any = {
+                ruleId: 'generic',
+                message: { text: 'No locations' },
+                locations: []
+            };
+            const response: SecretsScanResponse = getDummyRunner().convertResponse(
+                createResponseWithResults([validResult, informationalResult, emptyLocationsResult])
+            );
+            assert.isDefined(response.filesWithIssues);
+            assert.equal(response.filesWithIssues.length, 1);
+            assert.equal(response.filesWithIssues[0].full_path, '/test/file.js');
         });
     });
 
