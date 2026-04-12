@@ -98,10 +98,7 @@ describe('Nuget Utils Tests', async () => {
     it('Create NuGet Dependencies Trees - tolerates .csproj count mismatch', async () => {
         const partialDir: vscode.Uri = vscode.Uri.file(path.join(tmpDir.fsPath, 'partial'));
         const partialFolders: vscode.WorkspaceFolder[] = [{ uri: partialDir, name: '', index: 0 }];
-        const packageDescriptors: Map<PackageType, vscode.Uri[]> = await ScanUtils.locatePackageDescriptors(
-            partialFolders,
-            treesManager.logManager
-        );
+        const packageDescriptors: Map<PackageType, vscode.Uri[]> = await ScanUtils.locatePackageDescriptors(partialFolders, treesManager.logManager);
         const solutions: vscode.Uri[] | undefined = packageDescriptors.get(PackageType.Nuget);
         assert.isDefined(solutions);
 

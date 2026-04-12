@@ -11,7 +11,7 @@ export enum ScanType {
 
 export type AnalyzerManagerSeverityLevel = 'none' | 'note' | 'warning' | 'error';
 
-export type ResultKind = 'pass' | 'fail';
+export type ResultKind = 'pass' | 'fail' | 'informational';
 
 export interface AnalyzeScanRequest {
     // What type of scan
